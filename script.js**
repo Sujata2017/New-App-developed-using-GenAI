@@ -1,0 +1,96 @@
+let gameBoard = [];
+let currentPlayer = "X";
+let gameOver = false;
+
+// Initialize game board
+for (let i = 1; i <= 9; i++) {
+    gameBoard.push({ id: `square${i}`, value: "" });
+}
+
+// Update turn indicator
+function updateTurnIndicator() {
+    const turnIndicatorElement = document.querySelector(".turn-indicator");
+    turnIndicatorElement.textContent = `${currentPlayer}'s turn`;
+}
+
+// Handle square click event
+function handleSquareClick(event) {
+    if (gameOver) return;
+    const squareId = event.target.id;
+    const squareIndex = gameBoard.findIndex((square) => square.id === squareId);
+    if (gameBoard[squareIndex].value === "") {
+        gameBoard[squareIndex].value = currentPlayer;
+        updateGameBoard();
+        checkWinCondition();
+        checkDrawCondition();
+        switchPlayer();
+    }
+}
+
+// Update game board
+function updateGameBoard() {
+    gameBoard.forEach((square) => {
+        const squareElement = document.getElementById(square.id);
+        squareElement.textContent = square.value;
+    });
+}
+
+// Check win condition
+function checkWinCondition() {
+    const winConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    for (const condition of winConditions) {
+        if (
+            gameBoard[condition[0]].value === currentPlayer &&
+            gameBoard[condition[1]].value === currentPlayer &&
+            gameBoard[condition[2]].value === currentPlayer
+        ) {
+            gameOver = true;
+            alert(`Player ${currentPlayer} wins!`);
+            return;
+        }
+    }
+}
+
+// Check draw condition
+function checkDrawCondition() {
+    if (!gameOver && gameBoard.every((square) => square.value !== "")) {
+        gameOver = true;
+        alert("It's a draw!");
+    }
+}
+
+// Switch player
+function switchPlayer() {
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    updateTurnIndicator();
+}
+
+// Handle reset button click event
+function handleResetButtonClick() {
+    gameBoard.forEach((square) => {
+        square.value = "";
+    });
+    gameOver = false;
+    currentPlayer = "X";
+    updateGameBoard();
+    updateTurnIndicator();
+}
+
+// Add event listeners
+document.querySelectorAll(".square").forEach((square) => {
+    square.addEventListener("click", handleSquareClick);
+});
+
+document.getElementById("reset-button").addEventListener("click", handleResetButtonClick);
+
+// Initialize game
+updateTurnIndicator();
